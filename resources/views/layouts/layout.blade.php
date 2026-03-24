@@ -1,8 +1,8 @@
 @include('layouts.header')
 
+<body>
+@include('layouts.navbar')
 <main class="">
-    @include('layouts.navbar')
-    <div class="">
-        @yield('content')
-    </div>
+    @yield('content')
 </main>
+</body>
