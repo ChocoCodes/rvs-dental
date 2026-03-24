@@ -1,5 +1,6 @@
 @extends('layouts.layout')
 
+@section('content')
 <div class="relative min-h-screen flex items-center justify-start p-4 md:p-20 lg:px-30">
     <div class="w-full flex flex-col gap-36 items-start md:p-10 lg:p-20">
         <x-forms.container class="w-full max-w-sm flex flex-col gap-8 items-start">
@@ -55,3 +56,4 @@
         </defs>
     </svg>
 </div>
+@endsection
