@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            // UserSeeder::class,
+            UserSeeder::class, // DO NOT REMOVE!
             MedicalConditionSeeder::class,
             ProcedureSeeder::class,
             ToothNumberingSeeder::class,
