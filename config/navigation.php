@@ -1,17 +1,17 @@
 <?php
-//  Custom config for static nav routes 
+//  Custom config for static nav routes
 return [
     'links' => [
         [
-            'name' => 'Patients',
+            'name' => 'PATIENTS',
             'url' => '/patients',
         ],
         [
-            'name' => 'Appointments',
+            'name' => 'APPOINTMENTS',
             'url' => '/appointments',
         ],
         [
-            'name' => 'Transactions',
+            'name' => 'TRANSACTIONS',
             'url' => '/transactions',
         ],
     ]
