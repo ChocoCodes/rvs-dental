@@ -1,10 +1,12 @@
-<x-forms.container
-    action="{{ route('patients.update', $patient) }}"
-    method="POST"
->
-    @method('PUT')
+@extends('layouts.layout')
 
-    <x-ui.button type="submit" variant="primary" class="px-2 py-4">
-        Edit
-    </x-ui.button>
-</x-forms.container>
+@section('content')
+    <h1 class="font-bold">Edit Patient Information</h1>
+
+    @include('pages.patients.partials.form', [
+        'patient' => $patient,
+        'action' => route('patients.update', $patient),
+        'method' => 'PUT',
+        'submitLabel' => 'Save Changes'
+    ])
+@endsection

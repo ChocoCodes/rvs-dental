@@ -35,7 +35,9 @@ class Patient extends Model
 
     // Format Image filename to the corresponding file path where the image is stored
     public function getImageUrlAttribute(): string {
-        $path = "defaults/default-patient.jpg";
+        $path = $this->image_filename 
+            ? "patients/{$this->patient_id}/{$this->image_filename}"
+            : "defaults/default-patient.jpg";
         
         return Storage::url($path);
     }
