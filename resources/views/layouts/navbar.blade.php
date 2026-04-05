@@ -1,4 +1,4 @@
-<header class="p-4 sticky top-0 z-50 bg-white flex flex-col gap-4">
+<header class="p-4 sticky top-0 z-50 bg-background flex flex-col gap-4">
     <div class="flex w-full justify-between">
         <!-- Desktop Navigation -->
         <nav class="hidden md:flex gap-4 items-center">

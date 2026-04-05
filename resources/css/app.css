@@ -24,4 +24,18 @@
     --color-tertiary: #66D1D1;
     --color-danger: #F43F5E;
     --color-danger-muted: #FFF1F2;
+    --color-background: #F8F9FA;
+    --color-border: rgba(111, 121, 122, 0.5);
+}
+
+@layer base {
+    body {
+        @apply bg-background;
+    }
+
+}
+
+/* height of the entire screen excluding navbar height */
+@utility h-content {
+    @apply h-[calc(100dvh-77px)] md:h-[calc(100dvh-88px)];
 }

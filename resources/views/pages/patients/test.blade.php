@@ -2,7 +2,7 @@
 
 @section('content')
     <a href="{{ route('patients.create') }}">Add</a>
-    
+
     @if(session('success'))
         <div class="bg-green-50 border border-green-200 rounded p-3">
             <p class="text-green-600 text-sm">{{ session('success') }}</p>
@@ -18,7 +18,7 @@
             </ul>
         </div>
     @endif
-    
+
     <div class="flex flex-col gap-4 w-full">
         @foreach ($patients as $patient)
             <div class="flex flex-col gap-1">

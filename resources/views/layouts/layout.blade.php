@@ -4,7 +4,7 @@
 @auth
     @include('layouts.navbar')
 @endauth
-<main class="">
+<main class="h-content">
     @yield('content')
 </main>
 </body>

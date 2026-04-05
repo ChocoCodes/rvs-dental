@@ -12,7 +12,7 @@ class PatientController extends Controller
     // Show lists of patients (Paginated + Infinite Scrolling + Search Bar)
     public function index() {
         $patients = Patient::latest()->paginate(10);
-        return view('pages.patients.test', compact('patients'));
+        return view('pages.patients.index', compact('patients'));
     }
     // Display patient add form
     public function create() {
@@ -26,7 +26,7 @@ class PatientController extends Controller
         if ($request->hasFile('image_filename')) {
             $folder = "patients/{$patient->patient_id}";
             $imageFile = $request->file('image_filename')->store($folder, 'public');
-            
+
             $patient->image_filename = basename($imageFile);
             $patient->save();
         }
@@ -53,7 +53,7 @@ class PatientController extends Controller
 
             $folder = "patients/{$patient->patient_id}";
             $imageFile = $request->file('image_filename')->store($folder, 'public');
-            
+
             $patient->image_filename = basename($imageFile);
             $patient->save();
         }

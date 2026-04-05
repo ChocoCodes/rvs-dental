@@ -11,5 +11,6 @@
         <p>{{ $patient->marital_status }}</p>
         <p>{{ $patient->guardian_name }}</p>
         <p>{{ $patient->sex }}</p>
+        <a href="{{ route('patients.edit', $patient) }}">Edit</a>
     </div>
 @endsection
