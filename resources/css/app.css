@@ -24,4 +24,29 @@
     --color-tertiary: #66D1D1;
     --color-danger: #F43F5E;
     --color-danger-muted: #FFF1F2;
+    --color-edge: #6F797A80;
+    --color-success: #22C55E;
+    --color-muted: #949494;
+    --color-pending: #FBBF24;
+}
+
+
+/** {*/
+/*    outline: 1px solid red;*/
+/*}*/
+
+#appointment-sidebar {
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+#appointment-sidebar.hidden {
+    display: none;
+    opacity: 0;
+    transform: translateX(20px);
+}
+
+#appointment-sidebar:not(.hidden) {
+    display: flex;
+    opacity: 1;
+    transform: translateX(0);
 }
