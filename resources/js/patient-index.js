@@ -8,7 +8,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function formatDate(dateStr) {
         const d = new Date(dateStr);
-        return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
+        return d.toLocaleDateString('en-US', {
+            month: 'long',
+            day: '2-digit',
+            year: 'numeric'
+        });
     }
 
     patientRows.forEach(row => {
