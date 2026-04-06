@@ -12,14 +12,14 @@
                     <div class="flex justify-between items-center">
                         <div class="flex flex-col gap-2">
                             <p class="font-bold text-xl">Basic Information</p>
-                            <p class="text-xs">Age: {age}</p>
+                            <p class="text-xs">Age: {{ $patient->age }}</p>
                             <p class="text-xs">Sex: {{ $patient->sex }}</p>
                             <p class="text-xs">DOB: {{ $patient->date_of_birth->format('F d, Y') }}</p>
                         </div>
                         <img
                             src="{{ $patient->image_url }}"
                             alt="Image of {{ $patient->first_name }} {{ $patient->last_name }}"
-                            class="w-[100px] bg-white aspect-square object-cover"
+                            class="w-25 bg-white aspect-square object-cover"
                         >
                     </div>
                     <div class="text-xs flex flex-col gap-2">

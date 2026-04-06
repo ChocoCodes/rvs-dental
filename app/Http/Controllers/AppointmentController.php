@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Appointment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreAppointmentRequest;
+use App\Http\Requests\UpdateAppointmentRequest;
 
 class AppointmentController extends Controller
 {
@@ -73,6 +75,21 @@ class AppointmentController extends Controller
         ]);
     }
 
+    public function create() {
+        return view('pages.appointments.create');
+    }
+
+    public function store(StoreAppointmentRequest $request) {
+
+    }
+
+    public function edit() {
+        return view('pages.appointments.edit');
+    }
+
+    public function update(UpdateAppointmentRequest $request, Appointment $appointment) {
+
+    }
     public function show($id)
     {
         $appointment = Appointment::with('patient', 'dentist')->findOrFail($id);
@@ -86,5 +103,5 @@ class AppointmentController extends Controller
             'scheduled_at' => Carbon::parse($appointment->scheduled_at)->format('F j, Y g:i A'),
         ]);
     }
-
+    
 }

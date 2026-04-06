@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon; 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -41,6 +42,12 @@ class Patient extends Model
         
         return Storage::url($path);
     }
+
+    // Calculate Patient Age
+    public function getAgeAttribute(): int {
+        return Carbon::parse($this->date_of_birth)->diffInYears(now());
+    }
+    
     // Patient - Appointment (1:M)
     public function appointments(): HasMany {
         return $this->hasMany(Appointment::class, 'patient_id');

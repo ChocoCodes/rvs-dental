@@ -3,13 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
-class UpdatePatientRequest extends BasePatientRequest
+class UpdatePatientRequest extends BaseFormRequest
 {
-    public function authorize(): bool
-    {
-        return auth()->check() && auth()->user()->hasRole(['Staff', 'Dentist']);
-    }
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -28,6 +23,16 @@ class UpdatePatientRequest extends BasePatientRequest
             'marital_status' => 'sometimes|in:Single,Married,Widowed,Separated',
             'guardian_name' => 'nullable|string|max:255',
             'sex' => 'sometimes|in:Male,Female',
+        ];
+    }
+
+    public function messages(): array {
+        return [
+            'date_of_birth.before' => 'Date of birth must be in the past.',
+            'sex.in' => 'Sex must be either Male or Female only.',
+            'marital_status.in' => 'Invalid marital status.',
+            'image_filename.mimes' => 'Image must be of the following formats only: .JPEG, .JPG, .PNG.',
+            'contact_no.regex' => 'Contact number must be a valid Philippine mobile number (e.g., 09123456789).'
         ];
     }
 }
