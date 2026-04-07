@@ -39,6 +39,8 @@
     --color-tertiary: #66D1D1;
     --color-danger: #F43F5E;
     --color-danger-muted: #FFF1F2;
+    --color-background: #F8F9FA;
+    --color-border: rgba(111, 121, 122, 0.5);
     --color-edge: #6F797A80;
     --color-success: #22C55E;
     --color-muted: #949494;
@@ -64,8 +66,6 @@
     display: flex;
     opacity: 1;
     transform: translateX(0);
-    --color-background: #F8F9FA;
-    --color-border: rgba(111, 121, 122, 0.5);
 }
 
 @layer base {
