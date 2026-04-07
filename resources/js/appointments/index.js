@@ -1,12 +1,42 @@
 import './appointments-scroll';
 import './appointments-detail';
+import './appointments-calendar';
 
 document.addEventListener('DOMContentLoaded', () => {
     const sortBtn = document.getElementById('date-sort-btn');
     const sortIcon = document.getElementById('date-sort-icon');
     const searchInput = document.getElementById('appointment-search');
+    const toggleViewBtn = document.getElementById('toggle-view-btn');
+    const viewText = document.getElementById('view-text');
+    const listPanel = document.getElementById('appointment-container');
+    const calendarPanel = document.getElementById('calendar-panel');
+    const infiniteTrigger = document.getElementById('infinite-scroll-trigger');
+
     let sortOrder = 'asc';
     let searchTimeout;
+    let isCalendarView = false;
+
+    if (toggleViewBtn && listPanel && calendarPanel) {
+        toggleViewBtn.addEventListener('click', () => {
+            isCalendarView = !isCalendarView;
+            
+            if (isCalendarView) {
+                listPanel.classList.add('hidden');
+                infiniteTrigger.classList.add('hidden');
+                calendarPanel.classList.remove('hidden');
+                viewText.textContent = 'List View';
+                
+                if (window.AppointmentCalendar && typeof window.AppointmentCalendar.init === 'function') {
+                    window.AppointmentCalendar.init();
+                }
+            } else {
+                listPanel.classList.remove('hidden');
+                infiniteTrigger.classList.remove('hidden');
+                calendarPanel.classList.add('hidden');
+                viewText.textContent = 'Calendar View';
+            }
+        });
+    }
 
     if (sortBtn && sortIcon) {
         sortBtn.addEventListener('click', () => {

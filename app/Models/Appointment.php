@@ -25,4 +25,16 @@ class Appointment extends Model
     {
         return $this->belongsTo(Dentist::class, 'dentist_id');
     }
+
+    public function procedures()
+    {
+        return $this->belongsToMany(DentalProcedure::class, 'appointment_procedures', 'appointment_id', 'procedure_id')
+            ->withPivot('notes', 'charged_price')
+            ->withTimestamps();
+    }
+
+    public function getProcedureTypeAttribute()
+    {
+        return $this->procedures->first()?->name ?? 'N/A';
+    }
 }

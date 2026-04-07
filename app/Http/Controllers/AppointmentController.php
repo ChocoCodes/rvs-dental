@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Appointment;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
 use App\Http\Requests\StoreAppointmentRequest;
 use App\Http\Requests\UpdateAppointmentRequest;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
 {
@@ -15,9 +15,9 @@ class AppointmentController extends Controller
         $sort = $request->query('sort', 'asc');
         $sort = in_array($sort, ['asc', 'desc']) ? $sort : 'asc';
         $search = $request->query('search');
-        $date = $request->query('date'); // Expects YYYY-MM-DD
+        $date = $request->query('date');
 
-        $query = Appointment::with('patient');
+        $query = Appointment::with(['patient', 'dentist']);
 
         if ($search) {
             $query->whereHas('patient', function ($q) use ($search) {
@@ -90,6 +90,7 @@ class AppointmentController extends Controller
     public function update(UpdateAppointmentRequest $request, Appointment $appointment) {
 
     }
+
     public function show($id)
     {
         $appointment = Appointment::with('patient', 'dentist')->findOrFail($id);
@@ -103,5 +104,30 @@ class AppointmentController extends Controller
             'scheduled_at' => Carbon::parse($appointment->scheduled_at)->format('F j, Y g:i A'),
         ]);
     }
-    
+
+    public function calendar(Request $request)
+    {
+        $month = $request->query('month', now()->month);
+        $year = $request->query('year', now()->year);
+
+        $appointments = Appointment::with('patient')
+            ->whereMonth('scheduled_at', $month)
+            ->whereYear('scheduled_at', $year)
+            ->get();
+
+        $grouped = $appointments->groupBy(function ($appt) {
+            return Carbon::parse($appt->scheduled_at)->format('Y-m-d');
+        })->map(function ($dayAppointments) {
+            return $dayAppointments->map(function ($appt) {
+                return [
+                    'id' => $appt->appointment_id,
+                    'patient_name' => "{$appt->patient->first_name} {$appt->patient->last_name}",
+                    'status' => $appt->status,
+                ];
+            });
+        });
+
+        return response()->json($grouped);
+    }
+
 }

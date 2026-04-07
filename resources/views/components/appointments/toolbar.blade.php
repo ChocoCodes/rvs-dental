@@ -1,4 +1,4 @@
-<div class="bg-gray-100 px-4 py-3 rounded-t-xl border border-edge flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="bg-gray-100 px-4 py-3 rounded-t-xl border-b border-edge flex flex-col md:flex-row justify-between items-center gap-4">
 
     <div class="bg-white flex items-center px-3 py-2 rounded-xl border border-edge w-full md:w-2/5 focus-within:border-primary transition-colors">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-gray-400">
@@ -30,8 +30,8 @@
             New Appointment
         </a>
         {{-- Calendar View Button --}}
-        <x-ui.button variant="outline" class="rounded-xl gap-2">
-            Calendar View
+        <x-ui.button id="toggle-view-btn" variant="outline" class="rounded-xl gap-2 min-w-[140px]">
+            <span id="view-text">Calendar View</span>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 text-gray-500">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
             </svg>
