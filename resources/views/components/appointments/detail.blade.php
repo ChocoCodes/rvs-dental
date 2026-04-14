@@ -46,6 +46,7 @@
     </div>
 
     <div class="px-6 py-6 border-t border-edge">
+        <h3 class="text-lg font-bold text-gray-900 mb-2">Remarks</h3>
         <p class="text-sm text-gray-900 leading-relaxed">
             {{ $appointment->remarks ?? 'No specific remarks for this appointment.' }}
         </p>
