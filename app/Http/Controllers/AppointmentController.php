@@ -6,11 +6,14 @@ use App\Models\Appointment;
 use App\Http\Requests\StoreAppointmentRequest;
 use App\Http\Requests\UpdateAppointmentRequest;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\View\View;
 
 class AppointmentController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): View|Response
     {
         $sort = $request->query('sort', 'asc') === 'desc' ? 'desc' : 'asc';
 
@@ -21,8 +24,15 @@ class AppointmentController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        // Transform the collection using a dedicated private method
-        $rawAppointments->getCollection()->transform(fn($appointment) => $this->formatForList($appointment));
+        // Transform collection for the list view
+        $rawAppointments->getCollection()->transform(fn($appointment) => [
+            'appointment_id' => $appointment->appointment_id,
+            'date'           => $appointment->scheduled_at->format('F j, Y'),
+            'name'           => $appointment->patient_full_name,
+            'remarks'        => $appointment->remarks ?? 'No remarks provided.',
+            'status'         => $appointment->status,
+            'color'          => $appointment->status_color,
+        ]);
 
         $appointments = $rawAppointments->getCollection()->groupBy('date');
 
@@ -41,7 +51,7 @@ class AppointmentController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(): View
     {
         return view('pages.appointments.create');
     }
@@ -54,8 +64,14 @@ class AppointmentController extends Controller
             ->with('success', 'Appointment created successfully.');
     }
 
-    // Fixed: Added Model Binding parameter
-    public function edit(Appointment $appointment)
+    public function show(Appointment $appointment): View
+    {
+        $appointment->load(['patient', 'dentist', 'procedures']);
+
+        return view('components.appointments.detail', compact('appointment'));
+    }
+
+    public function edit(Appointment $appointment): View
     {
         return view('pages.appointments.edit', compact('appointment'));
     }
@@ -68,60 +84,24 @@ class AppointmentController extends Controller
             ->with('success', 'Appointment updated successfully.');
     }
 
-    public function show($id)
-    {
-        $appointment = Appointment::with('patient', 'dentist')->findOrFail($id);
-
-        return response()->json([
-            'id' => $appointment->appointment_id,
-            'patient_name' => $appointment->patient ? "{$appointment->patient->first_name} {$appointment->patient->last_name}" : 'Unknown',
-            'patient_image_url' => $appointment->patient?->image_url,
-            'dentist_name' => $appointment->dentist ? "{$appointment->dentist->first_name} {$appointment->dentist->last_name}" : 'N/A',
-            'remarks' => $appointment->remarks,
-            'status' => $appointment->status,
-            'scheduled_at' => Carbon::parse($appointment->scheduled_at)->format('F j, Y g:i A'),
-        ]);
-    }
-
     public function calendar(Request $request)
     {
-        $month = $request->query('month', now()->month);
-        $year = $request->query('year', now()->year);
+        $month = (int) $request->query('month', now()->month);
+        $year = (int) $request->query('year', now()->year);
 
         $appointments = Appointment::with('patient')
             ->whereMonth('scheduled_at', $month)
             ->whereYear('scheduled_at', $year)
-            ->get();
+            ->get()
+            ->groupBy(fn($appt) => $appt->scheduled_at->format('Y-m-d'));
 
-        $grouped = $appointments->groupBy(fn($appt) => Carbon::parse($appt->scheduled_at)->format('Y-m-d'))
-            ->map(fn($dayAppointments) => $dayAppointments->map(fn($appt) => [
-                'id' => $appt->appointment_id,
-                'patient_name' => $appt->patient ? "{$appt->patient->first_name} {$appt->patient->last_name}" : 'Unknown',
-                'status' => $appt->status,
-            ]));
+        if ($request->ajax()) {
+            return response()->json([
+                'html' => view('components.appointments.calendar-grid', compact('appointments', 'month', 'year'))->render(),
+                'monthName' => Carbon::create($year, $month, 1)->format('F Y'),
+            ]);
+        }
 
-        return response()->json($grouped);
-    }
-
-    private function formatForList(Appointment $appointment): array
-    {
-        $color = match($appointment->status) {
-            'Completed' => 'text-success',
-            'Scheduled' => 'text-pending',
-            'Cancelled' => 'text-danger',
-            'No Show'   => 'text-muted',
-            default     => 'text-blue-500',
-        };
-
-        return [
-            'appointment_id' => $appointment->appointment_id,
-            'date'           => Carbon::parse($appointment->scheduled_at)->format('F j, Y'),
-            'name'           => $appointment->patient
-                ? "{$appointment->patient->first_name} {$appointment->patient->last_name}"
-                : 'Unknown Patient',
-            'remarks'        => $appointment->remarks ?? 'No remarks provided.',
-            'status'         => $appointment->status,
-            'color'          => $color,
-        ];
+        return view('components.appointments.calendar-grid', compact('appointments', 'month', 'year'));
     }
 }

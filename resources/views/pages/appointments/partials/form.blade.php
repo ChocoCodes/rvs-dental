@@ -19,17 +19,8 @@
     @endif
 
     <div class="flex gap-2">
-        {{-- Patient Name --}}
-        <div class="flex flex-col gap-1">
-            <label for="patient_name" class="font-bold text-sm md:text-base">Patient Name</label>
-            <input type="text" name="patient_name" id="patient_name" placeholder="Enter Patient Name...">
-        </div>
-    
-        {{-- Patient ID field --}}
-        <div class="flex flex-col gap-1">
-            <label for="patient_id" class="font-bold text-sm md:text-base">Patient ID</label>
-            <input type="text" readonly name="patient_id" id="patient_id" value="{{ old('patient_id', $appointment->patient_id) }}">
-        </div>
+        {{-- Patient Name --}}   
+        <x-forms.patient-search />
     </div>
  
     {{-- Dentist in charge --}}

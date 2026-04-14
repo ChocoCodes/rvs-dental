@@ -13,8 +13,13 @@ class Appointment extends Model
         'patient_id',
         'dentist_id',
         'scheduled_at',
+        'slot',
         'status',
         'remarks'
+    ];
+
+    protected $casts = [
+        'scheduled_at' => 'datetime',
     ];
 
     // --- Relationships ---
@@ -38,9 +43,27 @@ class Appointment extends Model
 
     // --- Accessors ---
 
-    public function getProcedureTypeAttribute()
+    public function getProcedureTypeAttribute(): string
     {
         return $this->procedures->first()?->name ?? 'N/A';
+    }
+
+    public function getStatusColorAttribute(): string
+    {
+        return match($this->status) {
+            'Completed' => 'text-success',
+            'Scheduled' => 'text-pending',
+            'Cancelled' => 'text-danger',
+            'No Show'   => 'text-muted',
+            default     => 'text-blue-500',
+        };
+    }
+
+    public function getPatientFullNameAttribute(): string
+    {
+        return $this->patient 
+            ? "{$this->patient->first_name} {$this->patient->last_name}" 
+            : 'Unknown Patient';
     }
 
     // --- Scopes ---
