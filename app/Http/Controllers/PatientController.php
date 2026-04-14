@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePatientRequest;
 use App\Http\Requests\UpdatePatientRequest;
+use App\Models\Appointment;
 use App\Models\Patient;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -13,9 +14,52 @@ class PatientController extends Controller
     // Show lists of patients (Paginated + Infinite Scrolling + Search Bar)
     public function index()
     {
-        $patients = Patient::latest()->paginate(10);
+        $search = request()->query('search');
 
-        return view('pages.patients.index', compact('patients'));
+        $rawPatients = Patient::query()
+            ->select('patients.*')
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"]);
+                });
+            })
+            ->selectSub(
+                Appointment::query()
+                    ->select('remarks')
+                    ->whereColumn('appointments.patient_id', 'patients.patient_id')
+                    ->orderByDesc('scheduled_at')
+                    ->limit(1),
+                'last_appointment_remarks'
+            )
+            ->selectSub(
+                Appointment::query()
+                    ->select('updated_at')
+                    ->whereColumn('appointments.patient_id', 'patients.patient_id')
+                    ->orderByDesc('scheduled_at')
+                    ->limit(1),
+                'last_appointment_updated_at'
+            )
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        if (request()->ajax()) {
+            $patients = $rawPatients->getCollection();
+
+            if ($patients->isEmpty()) {
+                return response('', 204);
+            }
+
+            return response(view('components.patients.list', compact('patients'))->render())
+                ->header('X-Has-More', $rawPatients->hasMorePages() ? '1' : '0');
+        }
+
+        return view('pages.patients.index', [
+            'patients' => $rawPatients->getCollection(),
+            'hasMore' => $rawPatients->hasMorePages(),
+        ]);
     }
 
     // Display patient add form
@@ -46,6 +90,10 @@ class PatientController extends Controller
     // Display a specific patient information
     public function show(Patient $patient)
     {
+        $medicalHistoryLastUpdatedAt = DB::table('appointments')
+            ->where('patient_id', $patient->patient_id)
+            ->max('updated_at');
+
         $patientResponses = DB::table('patient_responses')
             ->join('appointments', 'appointments.appointment_id', '=', 'patient_responses.appointment_id')
             ->join('medical_questions', 'medical_questions.question_id', '=', 'patient_responses.question_id')
@@ -67,7 +115,7 @@ class PatientController extends Controller
             ->map(fn ($id) => (int) $id)
             ->all();
 
-        return view('pages.patients.show', compact('patient', 'patientResponses', 'medicalConditions', 'patientConditionIds'));
+        return view('pages.patients.show', compact('patient', 'medicalHistoryLastUpdatedAt', 'patientResponses', 'medicalConditions', 'patientConditionIds'));
     }
 
     // Show patient edit form

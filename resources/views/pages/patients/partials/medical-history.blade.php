@@ -3,7 +3,7 @@
         <p class="font-bold text-2xl md:text-3xl">Medical History</p>
         <div class="text-xs flex flex-col items-end text-right">
             <p>LAST UPDATED</p>
-            <p>{date}</p>
+            <p>{{ $medicalHistoryLastUpdatedAt ? \Illuminate\Support\Carbon::parse($medicalHistoryLastUpdatedAt)->format('F d, Y h:i A') : 'N/A' }}</p>
         </div>
     </div>
     <div class="flex-1 p-5 overflow-auto">
