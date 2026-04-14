@@ -13,6 +13,7 @@ Route::post('/', [LoginController::class, 'authenticate'])->name('login.post');
 Route::middleware(['auth', 'role'])->group(function () {
     Route::prefix('/appointments')->group(function () {
         Route::get('/calendar/data', [AppointmentController::class, 'calendar'])->name('appointments.calendar.data');
+        Route::get('/view/{appointment}', [AppointmentController::class, 'view'])->name('appointments.view');
     });
     Route::prefix('/patients')->group(function() {
         Route::get('/certificate', [PatientController::class, 'certificate']);

@@ -16,11 +16,12 @@ class StoreAppointmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'patient_id' => 'required|integer|exists:patient,patient_id',
-            'dentist_id' => 'required|integer|exists:dentist,dentist_id',
+            'patient_id' => 'required|integer|exists:patients,patient_id',
+            'dentist_id' => 'required|integer|exists:dentists,dentist_id',
+            'slot' => 'required|in:Morning,Afternoon',
             'scheduled_at' => 'required|date|after:now',
             'status' => 'required|string|in:Scheduled,Complete,Cancelled,No Show',
-            'remarks' => 'required|string|max:500'
+            'remarks' => 'nullable|string|max:500'
         ];
     }
     public function messages(): array
@@ -29,9 +30,10 @@ class StoreAppointmentRequest extends FormRequest
             'dentist_id.required'   => 'Please assign a dentist.',
             'dentist_id.exists'     => 'The selected dentist does not exist.',
             'scheduled_at.required' => 'Please enter a schedule slot.',
+            'slot.in'               => 'Invalid slot selection.',
             'scheduled_at.after'    => 'The schedule must be a future date and time.',
             'status.required'       => 'Please select a status.',
-            'status.in'             => 'The selected status is invalid.',
+            'status.in'             => 'Invalid status selection.',
             'remarks.max'           => 'Remarks must not exceed 500 characters.',
         ];
     }

@@ -6,7 +6,6 @@ use App\Models\Appointment;
 use App\Http\Requests\StoreAppointmentRequest;
 use App\Http\Requests\UpdateAppointmentRequest;
 use Carbon\Carbon;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
@@ -58,9 +57,9 @@ class AppointmentController extends Controller
 
     public function store(StoreAppointmentRequest $request)
     {
-        Appointment::create($request->validated());
+        $appointment = Appointment::create($request->validated());
 
-        return redirect()->route('appointments.index')
+        return redirect()->route('appointments.view', $appointment)
             ->with('success', 'Appointment created successfully.');
     }
 
@@ -80,7 +79,7 @@ class AppointmentController extends Controller
     {
         $appointment->update($request->validated());
 
-        return redirect()->route('appointments.index')
+        return redirect()->route('pages.appointments.view', $appointment)
             ->with('success', 'Appointment updated successfully.');
     }
 
@@ -103,5 +102,9 @@ class AppointmentController extends Controller
         }
 
         return view('components.appointments.calendar-grid', compact('appointments', 'month', 'year'));
+    }
+
+    public function view(Appointment $appointment) {
+        return view('pages.appointments.view', compact('appointment'));
     }
 }

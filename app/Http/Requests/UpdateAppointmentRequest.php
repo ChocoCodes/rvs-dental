@@ -15,8 +15,8 @@ class UpdateAppointmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'patient_id' => 'sometimes|integer|exists:patient,patient_id',
-            'dentist_id' => 'sometimes|integer|exists:dentist,dentist_id',
+            'patient_id' => 'sometimes|integer|exists:patients,patient_id',
+            'dentist_id' => 'sometimes|integer|exists:dentists,dentist_id',
             'scheduled_at' => 'sometimes|date|after:now',
             'status' => 'sometimes|string|in:Scheduled,Complete,Cancelled,No Show',
             'remarks' => 'sometimes|string|max:500'

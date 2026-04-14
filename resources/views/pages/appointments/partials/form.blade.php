@@ -5,7 +5,7 @@
 >
     @method($method ?? 'POST')
     @php
-        $status = ['Schedules', 'Completed', 'Cancelled', 'No Show'];
+        $status = ['Scheduled', 'Completed', 'Cancelled', 'No Show'];
         $slots = ['Morning (9AM-12PM)', 'Afternoon (1PM-6PM)'];
     @endphp
     @if($errors->any())
@@ -47,8 +47,9 @@
             <x-forms.select name="slot" id="slot" variant="form" class="w-full">
                 <option value="" disabled {{ old('slot', $appointment->slot) ? '' : 'selected' }}>Select Time Slot</option>
                 @foreach ($slots as $slotOption)
-                    <option value="{{ $slotOption }}"
-                        {{ old('slot', $appointment->slot) === $slotOption ? 'selected' : '' }}
+                    @php $slotValue = strtok($slotOption, ' ') @endphp
+                    <option value="{{ $slotValue }}"
+                        {{ old('slot', $appointment->slot) === $slotValue ? 'selected' : '' }}
                     >
                         {{ $slotOption }}
                     </option>
@@ -75,9 +76,7 @@
     {{-- Appointment Remarks --}}
     <div class="flex flex-col gap-1 w-full md:flex-1">
         <label for="status" class="font-bold text-sm md:text-base">Additional Remarks</label>
-        <textarea name="remarks" id="remarks" placeholder="Enter remarks here...">
-            {{ old('remarks', $appointment->remarks) }}
-        </textarea>
+        <textarea name="remarks" id="remarks" placeholder="Enter remarks here...">{{ old('remarks', $appointment->remarks) }}</textarea>
     </div>
 
     <x-ui.button 
