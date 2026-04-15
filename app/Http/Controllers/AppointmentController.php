@@ -15,10 +15,12 @@ class AppointmentController extends Controller
     public function index(Request $request): View|Response
     {
         $sort = $request->query('sort', 'asc') === 'desc' ? 'desc' : 'asc';
+        $status = $request->query('status', 'Scheduled');
 
         $rawAppointments = Appointment::with(['patient', 'dentist'])
             ->searchByPatient($request->query('search'))
             ->filterByDate($request->query('date'))
+            ->when($status !== 'All', fn($q) => $q->where('status', $status))
             ->orderBy('scheduled_at', $sort)
             ->paginate(10)
             ->withQueryString();

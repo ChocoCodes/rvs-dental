@@ -77,4 +77,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    const statusFilterSelect = document.getElementById('status-filter');
+
+    if (statusFilterSelect) {
+        statusFilterSelect.addEventListener('change', (e) => {
+            const val = e.target.value;
+            if (window.AppointmentList && typeof window.AppointmentList.setStatus === 'function') {
+                window.AppointmentList.setStatus(val);
+            }
+        });
+    }
 });

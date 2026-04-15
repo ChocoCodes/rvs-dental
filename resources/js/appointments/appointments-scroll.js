@@ -12,6 +12,7 @@ window.AppointmentList = (() => {
     let currentSort = 'asc';
     let currentSearch = '';
     let currentDate = '';
+    let currentStatus = document.getElementById('status-filter')?.value || 'Scheduled';
 
     const loadMore = async (reset = false) => {
         if (!reset && (isLoading || !hasMore)) return;
@@ -42,6 +43,7 @@ window.AppointmentList = (() => {
             url.searchParams.set('sort', currentSort);
             if (currentSearch) url.searchParams.set('search', currentSearch);
             if (currentDate) url.searchParams.set('date', currentDate);
+            if (currentStatus) url.searchParams.set('status', currentStatus);
 
             const response = await fetch(url.toString(), {
                 headers: {
@@ -113,6 +115,10 @@ window.AppointmentList = (() => {
         },
         setDate: (date) => {
             currentDate = date;
+            loadMore(true);
+        },
+        setStatus: (status) => {
+            currentStatus = status;
             loadMore(true);
         },
         retry: () => {
