@@ -5,7 +5,7 @@
         <a href="{{ route('appointments.edit', $appointment) }}">Edit Appointment</a>
         <button type="button" id="upload-btn">Add Procedure Images</button>
         <a href="{{ route('appointments.generate', $appointment) }}">Generate Certificate</a>
-        <a href="{{ route('appointments.generate', $appointment) }}">Medical Form</a>
+        <a href="{{ route('appointments.medical-form', $appointment) }}">Medical Form</a>
     
     </div>
 

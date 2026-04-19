@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Appointment extends Model
 {
     protected $table = 'appointments';
+
     protected $primaryKey = 'appointment_id';
 
     protected $fillable = [
@@ -15,7 +17,7 @@ class Appointment extends Model
         'scheduled_at',
         'slot',
         'status',
-        'remarks'
+        'remarks',
     ];
 
     protected $casts = [
@@ -46,8 +48,19 @@ class Appointment extends Model
             ->withTimestamps();
     }
 
-    public function procedureFiles() {
+    public function procedureFiles()
+    {
         return $this->hasMany(ProcedureFile::class, 'appointment_id', 'appointment_id');
+    }
+
+    public function medicalResponses(): HasMany
+    {
+        return $this->hasMany(PatientResponse::class, 'appointment_id', 'appointment_id');
+    }
+
+    public function patientConditions(): HasMany
+    {
+        return $this->hasMany(PatientCondition::class, 'appointment_id', 'appointment_id');
     }
     // --- Accessors ---
 
@@ -58,19 +71,19 @@ class Appointment extends Model
 
     public function getStatusColorAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'Completed' => 'text-success',
             'Scheduled' => 'text-pending',
             'Cancelled' => 'text-danger',
-            'No Show'   => 'text-muted',
-            default     => 'text-blue-500',
+            'No Show' => 'text-muted',
+            default => 'text-blue-500',
         };
     }
 
     public function getPatientFullNameAttribute(): string
     {
-        return $this->patient 
-            ? "{$this->patient->first_name} {$this->patient->last_name}" 
+        return $this->patient
+            ? "{$this->patient->first_name} {$this->patient->last_name}"
             : 'Unknown Patient';
     }
 
@@ -78,7 +91,7 @@ class Appointment extends Model
 
     public function scopeSearchByPatient($query, $search)
     {
-        if (!$search) {
+        if (! $search) {
             return $query;
         }
 
@@ -91,7 +104,7 @@ class Appointment extends Model
 
     public function scopeFilterByDate($query, $date)
     {
-        if (!$date) {
+        if (! $date) {
             return $query;
         }
 

@@ -2,9 +2,9 @@
 
 @section('hideNavbar', true)
 @section('content')
-    <div class="flex items-center justify-between py-4 md:py-8 mx-4 md:mx-8 border-b border-border sticky top-0 z-50 bg-background">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 py-4 md:py-8 mx-4 md:mx-8 border-b border-border sticky top-0 z-50 bg-background">
         <h1 class="text-2xl md:text-5xl">{{ $patient->first_name }} {{ $patient->last_name }}</h1>
-        <div class="flex gap-2 items-center">
+        <div class="flex flex-wrap gap-2 items-center">
             <x-forms.container
                 action="{{ route('patients.destroy', $patient) }}"
                 onsubmit="return confirm('Are you sure you want to remove this patient? This process is irreversible.')"

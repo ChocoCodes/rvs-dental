@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Appointment;
 use App\Http\Requests\StoreAppointmentRequest;
 use App\Http\Requests\UpdateAppointmentRequest;
+use App\Models\Appointment;
+use App\Models\MedicalCondition;
+use App\Models\MedicalQuestion;
+use App\Models\PatientCondition;
+use App\Models\PatientResponse;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class AppointmentController extends Controller
@@ -20,19 +25,19 @@ class AppointmentController extends Controller
         $rawAppointments = Appointment::with(['patient', 'dentist'])
             ->searchByPatient($request->query('search'))
             ->filterByDate($request->query('date'))
-            ->when($status !== 'All', fn($q) => $q->where('status', $status))
+            ->when($status !== 'All', fn ($q) => $q->where('status', $status))
             ->orderBy('scheduled_at', $sort)
             ->paginate(10)
             ->withQueryString();
 
         // Transform collection for the list view
-        $rawAppointments->getCollection()->transform(fn($appointment) => [
+        $rawAppointments->getCollection()->transform(fn ($appointment) => [
             'appointment_id' => $appointment->appointment_id,
-            'date'           => $appointment->scheduled_at->format('F j, Y'),
-            'name'           => $appointment->patient_full_name,
-            'remarks'        => $appointment->remarks ?? 'No remarks provided.',
-            'status'         => $appointment->status,
-            'color'          => $appointment->status_color,
+            'date' => $appointment->scheduled_at->format('F j, Y'),
+            'name' => $appointment->patient_full_name,
+            'remarks' => $appointment->remarks ?? 'No remarks provided.',
+            'status' => $appointment->status,
+            'color' => $appointment->status_color,
         ]);
 
         $appointments = $rawAppointments->getCollection()->groupBy('date');
@@ -75,6 +80,7 @@ class AppointmentController extends Controller
     public function edit(Appointment $appointment): View
     {
         $appointment->load('patient');
+
         return view('pages.appointments.edit', compact('appointment'));
     }
 
@@ -95,7 +101,7 @@ class AppointmentController extends Controller
             ->whereMonth('scheduled_at', $month)
             ->whereYear('scheduled_at', $year)
             ->get()
-            ->groupBy(fn($appt) => $appt->scheduled_at->format('Y-m-d'));
+            ->groupBy(fn ($appt) => $appt->scheduled_at->format('Y-m-d'));
 
         if ($request->ajax()) {
             return response()->json([
@@ -112,31 +118,141 @@ class AppointmentController extends Controller
         $appointment->load([
             'patient',
             'dentist',
-            'appointmentProcedures.dentalProcedure'
+            'appointmentProcedures.dentalProcedure',
         ]);
 
         return view('pages.appointments.generate', compact('appointment'));
     }
 
-    public function view(Appointment $appointment) {
+    public function view(Appointment $appointment)
+    {
         return view('pages.appointments.view', compact('appointment'));
     }
- 
-    public function uploadProcedureImages(Request $request, Appointment $appointment) {
+
+    public function medicalForm(Appointment $appointment): View
+    {
+        $questions = MedicalQuestion::query()
+            ->select('question_id', 'question')
+            ->orderBy('question_id')
+            ->get();
+
+        $conditions = MedicalCondition::query()
+            ->select('id', 'condition_name')
+            ->get();
+
+        $existingResponses = $appointment->medicalResponses()
+            ->get()
+            ->keyBy('question_id');
+
+        $existingConditionIds = $appointment->patientConditions()
+            ->pluck('condition_id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        return view('pages.appointments.medical-form', compact(
+            'appointment',
+            'questions',
+            'conditions',
+            'existingResponses',
+            'existingConditionIds'
+        ));
+    }
+
+    public function storeMedicalForm(Request $request, Appointment $appointment)
+    {
+        $radioOnly = [1, 6, 7, 10, 11, 12];
+        $radioWithNotes = [2, 3, 4, 5, 8];
+        $textOnly = [9, 13, 14];
+
+        $rules = [
+            'conditions' => ['nullable', 'array'],
+            'conditions.*' => ['integer', 'exists:medical_conditions,id'],
+        ];
+
+        foreach ($radioOnly as $questionId) {
+            $rules["responses.{$questionId}.answer"] = ['required', 'in:Yes,No,N/A'];
+            $rules["responses.{$questionId}.notes"] = ['nullable', 'string'];
+        }
+
+        foreach ($radioWithNotes as $questionId) {
+            $rules["responses.{$questionId}.answer"] = ['required', 'in:Yes,No,N/A'];
+            $rules["responses.{$questionId}.notes"] = ['nullable', 'string'];
+        }
+
+        foreach ($textOnly as $questionId) {
+            $rules["responses.{$questionId}.notes"] = ['required', 'string'];
+            $rules["responses.{$questionId}.answer"] = ['nullable', 'in:Yes,No,N/A'];
+        }
+
+        $validated = $request->validate($rules);
+
+        $selectedConditions = collect($validated['conditions'] ?? [])
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
+
+        $questionIds = array_merge($radioOnly, $radioWithNotes, $textOnly);
+
+        DB::transaction(function () use ($appointment, $validated, $questionIds, $textOnly, $selectedConditions) {
+            foreach ($questionIds as $questionId) {
+                $input = data_get($validated, "responses.{$questionId}", []);
+                $notes = trim((string) data_get($input, 'notes', ''));
+                $answer = data_get($input, 'answer');
+
+                if (in_array($questionId, $textOnly, true)) {
+                    $answer = 'N/A';
+                }
+
+                PatientResponse::updateOrCreate(
+                    [
+                        'appointment_id' => $appointment->appointment_id,
+                        'question_id' => $questionId,
+                    ],
+                    [
+                        'answer' => $answer,
+                        'notes' => $notes !== '' ? $notes : null,
+                    ]
+                );
+            }
+
+            $appointment->patientConditions()->delete();
+
+            if ($selectedConditions->isNotEmpty()) {
+                $rows = $selectedConditions
+                    ->map(fn ($conditionId) => [
+                        'appointment_id' => $appointment->appointment_id,
+                        'condition_id' => $conditionId,
+                        'notes' => null,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ])
+                    ->all();
+
+                PatientCondition::insert($rows);
+            }
+        });
+
+        return redirect()
+            ->route('appointments.view', $appointment)
+            ->with('success', 'Medical form saved successfully.');
+    }
+
+    public function uploadProcedureImages(Request $request, Appointment $appointment)
+    {
         $request->validate([
             'image' => 'required|array',
-            'images.*' => 'image|mimes:jpeg,jpg,png|max:10240'
+            'images.*' => 'image|mimes:jpeg,jpg,png|max:10240',
         ]);
 
         if ($request->hasFile('images')) {
-            foreach($request->file('images') as $image) {
+            foreach ($request->file('images') as $image) {
                 $folder = "appointments/{$appointment->appointment_id}";
                 $path = $image->store($folder, 'public');
 
                 $appointment->procedureFiles()->create([
                     'appointment_id' => $appointment->appointment_id,
                     'file_name' => basename($path),
-                    'file_type' => $image->getClientMimeType()
+                    'file_type' => $image->getClientMimeType(),
                 ]);
             }
         }
