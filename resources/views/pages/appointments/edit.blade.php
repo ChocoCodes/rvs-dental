@@ -2,9 +2,8 @@
 
 @section('hideNavbar', true)
 @section('content')
-    <div class="bg-background min-h-screen">
-        @include('pages.appointments.partials.form', [
-        'title' => 'Edit Appointment',
+    @include('pages.appointments.partials.form', [
+        'mode' => 'Edit',
         'appointment' => $appointment,
         'method' => 'PUT',
         'action' => route('appointments.update', $appointment),

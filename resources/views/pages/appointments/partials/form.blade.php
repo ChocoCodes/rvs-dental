@@ -1,7 +1,7 @@
 <div class="w-full px-4 sm:px-12 py-6 sm:py-10">
     {{-- Header --}}
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 gap-4">
-        <h1 class="text-4xl sm:text-6xl text-gray-900 tracking-tight">{{ $title ?? 'Add Appointment' }}</h1>
+        <h1 class="text-4xl sm:text-6xl text-gray-900 tracking-tight">{{ $mode }} Appointment</h1>
         <a href="{{ route('appointments.index') }}"
            class="bg-secondary/50 hover:bg-secondary text-primary px-4 sm:px-6 py-2 sm:py-3 rounded-xl text-[10px] sm:text-xs font-mono uppercase tracking-widest transition-colors flex items-center gap-2 border border-primary/20 w-full sm:w-auto justify-center">
             Return to Appointment List
