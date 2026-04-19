@@ -6,7 +6,7 @@
 
 @section('hideNavbar', true)
 @section('content')
-    <div class="flex items-center justify-between py-4 md:py-8 mx-4 md:mx-8 border-b border-border sticky top-0 z-50 bg-background">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 py-4 md:py-8 mx-4 md:mx-8 border-b border-border sticky top-0 z-50 bg-background">
         <h1 class="text-2xl md:text-5xl">Add Patient</h1>
         <x-ui.button variant="secondary" class="rounded-xl text-xs md:text-sm">
             <a href="{{ route('patients.index') }}">RETURN TO PATIENT LIST</a>
