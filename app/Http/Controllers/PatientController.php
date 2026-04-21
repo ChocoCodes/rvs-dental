@@ -202,7 +202,7 @@ class PatientController extends Controller
         $patients = Patient::where('first_name', 'like', "%{$searchTerm}%")
             ->orWhere('last_name', 'like', "%{$searchTerm}%")
             ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$searchTerm}%"])
-            ->select('first_name', 'last_name', 'patient_id')
+            ->select('first_name', 'last_name', 'patient_id', 'contact_no', 'date_of_birth')
             ->orderBy('last_name')
             ->get(10);
 

@@ -61,6 +61,7 @@
                 <li 
                     data-id="${patient.patient_id}" 
                     data-name="${patient.full_name}"
+                    data-patient='${JSON.stringify(patient)}'
                 >
                     ${patient.full_name}
                 </li>
@@ -70,9 +71,16 @@
             patientList.classList.remove('hidden');
             patientList.querySelectorAll('li[data-id]').forEach(li => {
                 li.addEventListener('click', function () {
+                    const patient = JSON.parse(this.dataset.patient);
+                    
                     searchInput.value = this.dataset.name;
                     patientId.value = this.dataset.id;
                     patientList.classList.add('hidden');
+
+                    // Send to other scripts using a CustomEvent
+                    document.dispatchEvent(new CustomEvent('patientSelected', {
+                        detail: patient
+                    }));
                 })
             })
 

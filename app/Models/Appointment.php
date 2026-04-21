@@ -24,6 +24,7 @@ class Appointment extends Model
         'scheduled_at' => 'datetime',
     ];
 
+    protected $appends = ['scheduled_at_fmt'];
     // --- Relationships ---
 
     public function patient()
@@ -87,11 +88,13 @@ class Appointment extends Model
             : 'Unknown Patient';
     }
 
+    public function getScheduledAtFmtAttribute() {
+        return $this->scheduled_at->format('D, M d, Y');
+    }
     // --- Scopes ---
-
     public function scopeSearchByPatient($query, $search)
     {
-        if (! $search) {
+        if (!$search) {
             return $query;
         }
 
@@ -104,10 +107,11 @@ class Appointment extends Model
 
     public function scopeFilterByDate($query, $date)
     {
-        if (! $date) {
+        if (!$date) {
             return $query;
         }
 
         return $query->whereDate('scheduled_at', $date);
     }
+    
 }

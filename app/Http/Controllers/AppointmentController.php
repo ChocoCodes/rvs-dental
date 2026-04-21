@@ -9,6 +9,7 @@ use App\Models\MedicalCondition;
 use App\Models\MedicalQuestion;
 use App\Models\PatientCondition;
 use App\Models\PatientResponse;
+use App\Models\Patient;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -300,5 +301,36 @@ class AppointmentController extends Controller
         }
 
         return back()->with('Success', 'Images uploaded successfully.');
+    }
+
+    public function forPatient(Patient $patient) {
+        return $patient->relevantAppointments()->get();
+    }
+
+    public function fullDetails(Appointment $appointment) {
+        $appointment->load([
+            'appointmentProcedures.dentalProcedure',
+            'appointmentProcedures.ledger.transactions'
+        ]);
+
+        $responseShape = [
+            'appointment_id' => $appointment->appointment_id,
+            'procedures' => $appointment->appointmentProcedures
+                ->map(fn($ap) => [
+                    'procedure_name' => $ap->dentalProcedure->name,
+                    'ledger_id' => $ap->ledger->ledger_id,
+                    'charged_price' => $ap->ledger->charged_price,
+                    'transactions' => $ap->ledger->transactions->map(fn($tx) => [
+                        'transaction_id' => $tx->transaction_id,
+                        'credit' => $tx->credit_amount,
+                        'debit' => $tx->debit_amount,
+                        'balance' => $tx->running_balance,
+                        'mode_of_payment' => $tx->mode_of_payment,
+                        'created_at' => $tx->created_at->format('M d, Y'),
+                    ])
+                ]),
+        ];
+
+        return response()->json($responseShape);
     }
 }

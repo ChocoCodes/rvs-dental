@@ -57,4 +57,13 @@ class Patient extends Model
     public function getFullNameAttribute(): string {
         return "{$this->first_name} {$this->last_name}";
     }
+
+    // --- Scopes ---
+    public function relevantAppointments() {
+        return $this->appointments()
+            ->select(['appointment_id', 'status', 'slot', 'scheduled_at', 'dentist_id'])
+            ->with('dentist:dentist_id,first_name,last_name')
+            ->whereIn('status', ['Scheduled', 'Completed'])
+            ->latest();
+    }
 }

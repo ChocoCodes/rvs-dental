@@ -58,7 +58,7 @@
         <x-ui.button
             type="submit"
             variant="primary"
-            class="w-full py-4 rounded-xl text-lg font-bold transition-all shadow-lg shadow-primary/20 uppercase tracking-widest text-sm"
+            class="w-full py-4 rounded-xl text-lg font-bold transition-all shadow-lg shadow-primary/20 uppercase tracking-widest"
         >
             Add Procedure
         </x-ui.button>
