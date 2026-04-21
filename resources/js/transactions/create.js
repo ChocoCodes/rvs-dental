@@ -113,10 +113,6 @@ const renderTransactions = (transactions) => {
                         ${tx.mode_of_payment || '-'}
                     </span>
                 </td>
-<<<<<<< Updated upstream
-                <td class="py-4 text-sm text-rose-500 text-right font-mono font-bold tracking-tight">${tx.debit ? '₱' + Number(tx.debit).toLocaleString(undefined, { minimumFractionDigits: 2 }) : '—'}</td>
-                <td class="py-4 text-sm text-green-600 text-right font-mono font-bold tracking-tight">${tx.credit ? '₱' + Number(tx.credit).toLocaleString(undefined, { minimumFractionDigits: 2 }) : '—'}</td>
-=======
                 <td class="py-4 text-sm text-rose-500 text-right font-mono font-bold tracking-tight">
                     ${Number(tx.debit) > 0 ? '₱' + Number(tx.debit).toLocaleString(undefined, { minimumFractionDigits: 2 }) : '—'}
                 </td>
@@ -126,7 +122,6 @@ const renderTransactions = (transactions) => {
                         <input type="number" step="0.01" min="0.01" value="${Number(tx.credit || 0).toFixed(2)}" data-credit-input="${tx.transaction_id}" class="w-24 border border-edge rounded-sm px-2 py-1 text-[11px] text-right font-mono font-bold text-gray-900 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
                     </div>
                 </td>
->>>>>>> Stashed changes
                 <td class="py-4 text-sm text-gray-900 text-right font-mono font-bold tracking-tight">₱${Number(tx.balance).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
             </tr>      
         `).join('')
@@ -139,8 +134,6 @@ const renderTransactions = (transactions) => {
         `;
 }
 
-<<<<<<< Updated upstream
-=======
 transactionTbl.addEventListener('click', async (e) => {
     const actionBtn = e.target.closest('button[data-action]');
     if (!actionBtn) return;
@@ -252,7 +245,6 @@ transactionTbl.addEventListener('click', async (e) => {
     }
 });
 
->>>>>>> Stashed changes
 document.addEventListener('patientSelected', async (e) => {
     const patient = e.detail;
     console.log('patient: ' + JSON.stringify(patient));
