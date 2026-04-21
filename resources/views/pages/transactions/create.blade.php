@@ -2,6 +2,7 @@
 
 @php
     $paymentMode = ['Cash', 'GCash', 'Card'];
+    $transactionType = ['Payment', 'Charge'];
 @endphp
 
 @section('content')
@@ -17,7 +18,7 @@
             <div class="p-4 space-y-6">
                 {{-- Search Section --}}
                 <div class="flex flex-col gap-2">
-                    <label class="text-[10px] font-mono font-bold text-gray-800 uppercase tracking-widest">Search Patient</label>
+                    <label class="text-sm font-mono font-bold text-gray-800 uppercase tracking-widest">Search Patient</label>
                     <x-forms.patient-search />
                 </div>
 
@@ -26,7 +27,7 @@
 
                 {{-- Appointments Section --}}
                 <div class="flex flex-col gap-2">
-                    <label class="text-[10px] font-mono font-bold text-gray-800 uppercase tracking-widest">Appointments</label>
+                    <label class="text-sm font-mono font-bold text-gray-800 uppercase tracking-widest">Appointments</label>
                     <div id="appointment-container" class="flex flex-col gap-3 w-full">
                         <p class="text-xs text-gray-500 font-mono italic uppercase tracking-widest">Select a patient to see appointments</p>
                     </div>
@@ -36,7 +37,7 @@
     </div>
 
     {{-- Ledger Record Panel --}}
-    <div class="h-content md:h-full col-span-12 md:col-span-7 lg:col-span-8 flex flex-col overflow-hidden bg-white border border-edge rounded-xl shadow-sm">
+    <div class="h-content md:h-full col-span-12 md:col-span-7 lg:col-span-8 flex flex-col gap-2 overflow-hidden bg-white border border-edge rounded-xl shadow-sm">
         <div class="flex justify-between items-center p-4 bg-gray-50 border-b border-edge">
             <h1 class="text-xl font-mono font-bold text-gray-800 uppercase tracking-tight">New Transaction</h1>
             <a href="{{ route('transactions.index') }}" class="bg-secondary/50 hover:bg-secondary text-primary px-4 py-2 rounded-xl text-[10px] font-mono uppercase tracking-widest transition-colors flex items-center gap-2 border border-primary/20">
@@ -46,7 +47,20 @@
                 Return to List
             </a>
         </div>
-
+        @if ($errors->any())
+            <div class="mb-4 p-4 rounded-xl bg-rose-50 border border-rose-200">
+                <ul class="text-rose-600 text-xs font-mono uppercase tracking-widest space-y-1">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        @if(session('success'))
+            <div class="mb-4 p-4 rounded-xl bg-green-50 border border-green-200 text-green-700 font-mono text-xs uppercase tracking-widest">
+                {{ session('success') }}
+            </div>
+        @endif
         <div class="flex-1 overflow-y-auto">
             <div class="p-6 space-y-8">
                 {{-- Ledger Table --}}
@@ -91,8 +105,13 @@
             </div>
 
             {{-- Form Section --}}
-            <div class="px-6 pb-6 mt-4">
-                <x-forms.container action="{{ route('transactions.store') }}" method="POST" class="bg-gray-50 border border-gray-200 rounded-2xl p-6">
+            <div class="px-6 pb-6 mt-4 flex flex-col gap-4">
+                <h3 class="text-sm font-mono font-bold text-gray-800 uppercase tracking-tight border-l-4 border-primary pl-2">Payment</h3>
+                <x-forms.container 
+                    action="{{ route('transactions.store') }}" 
+                    method="POST" 
+                    class="bg-gray-50 border border-gray-200 rounded-2xl p-6"
+                >
                     {{-- Totals --}}
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="p-4 rounded-xl bg-white border border-edge shadow-sm">
@@ -154,10 +173,31 @@
                                     name="mode_of_payment"
                                     id="mode-of-payment"
                                     class="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-sm font-mono focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none cursor-pointer pr-10"
-                                    required
                                 >
+                                    <option value="" disabled selected>Select payment mode</option>
                                     @foreach ($paymentMode as $mode)
                                         <option value="{{ $mode }}">{{ $mode }}</option>
+                                    @endforeach
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        {{-- Transaction Type --}}
+                        <div class="flex flex-col gap-2">
+                            <label class="text-[10px] font-mono font-bold text-gray-800 uppercase tracking-widest">Type</label>
+                            <div class="relative group">
+                                <select 
+                                    name="type"
+                                    id="transaction-type"
+                                    class="w-full bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-sm font-mono focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none cursor-pointer pr-10"
+                                    required
+                                >
+                                    @foreach ($transactionType as $type)
+                                        <option value="{{ $type }}">{{ $type }}</option>
                                     @endforeach
                                 </select>
                                 <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400 group-focus-within:text-primary transition-colors">

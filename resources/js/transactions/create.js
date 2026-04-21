@@ -6,6 +6,7 @@ const remainingBalanceEl = document.getElementById('remaining-balance');
 const creditAmountInput = document.getElementById('credit-amount');
 const payFullBtn = document.getElementById('pay-full-btn');
 const ledgerSelector = document.getElementById('ledger-selector');
+const transactionType = document.getElementById('transaction-type');
 
 let currentProcedures = [];
 
@@ -20,6 +21,9 @@ const getStatusClass = (status) => {
 }
 
 const updateTotals = (procedure) => {
+    console.log('procedure', procedure);
+    console.log('transactions', procedure.transactions);
+
     if (!procedure) {
         totalChargedEl.textContent = '₱0.00';
         totalPaidEl.textContent = '₱0.00';
@@ -29,7 +33,9 @@ const updateTotals = (procedure) => {
     }
 
     const totalCharged = Number(procedure.charged_price);
-    const totalPaid = procedure.transactions.reduce((sum, tx) => sum + Number(tx.credit || 0), 0);
+    const totalPaid = procedure.transactions
+        .filter(tx => tx.type === 'Payment')
+        .reduce((sum, tx) => sum + Number(tx.credit || 0), 0);
     const remainingBalance = totalCharged - totalPaid;
 
     totalChargedEl.textContent = `₱${totalCharged.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
@@ -95,17 +101,32 @@ const renderLedger = (entries) => {
 }
 
 const renderTransactions = (transactions) => {
+    console.log('rendering transactions:', transactions.map(t => t.transaction_id));
     transactionTbl.innerHTML = transactions.length
         ? transactions.map(tx => `
             <tr class="hover:bg-gray-50 transition-colors">
-                <td class="py-4 text-xs text-gray-700 font-mono uppercase tracking-tight font-bold">Payment on ${tx.created_at}</td>
+                <td class="py-4 text-xs text-gray-700 font-mono uppercase tracking-tight font-bold">
+                    ${tx.type} - ${tx.created_at}
+                </td>
                 <td class="py-4">
                     <span class="px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-widest bg-secondary/30 text-primary border border-primary/10">
-                        ${tx.mode_of_payment || 'CASH'}
+                        ${tx.mode_of_payment || '-'}
                     </span>
                 </td>
+<<<<<<< Updated upstream
                 <td class="py-4 text-sm text-rose-500 text-right font-mono font-bold tracking-tight">${tx.debit ? '₱' + Number(tx.debit).toLocaleString(undefined, { minimumFractionDigits: 2 }) : '—'}</td>
                 <td class="py-4 text-sm text-green-600 text-right font-mono font-bold tracking-tight">${tx.credit ? '₱' + Number(tx.credit).toLocaleString(undefined, { minimumFractionDigits: 2 }) : '—'}</td>
+=======
+                <td class="py-4 text-sm text-rose-500 text-right font-mono font-bold tracking-tight">
+                    ${Number(tx.debit) > 0 ? '₱' + Number(tx.debit).toLocaleString(undefined, { minimumFractionDigits: 2 }) : '—'}
+                </td>
+                <td class="py-4 text-sm text-green-600 text-right font-mono font-bold tracking-tight">
+                    <span data-credit-display="${tx.transaction_id}">${tx.credit ? '₱' + Number(tx.credit).toLocaleString(undefined, { minimumFractionDigits: 2 }) : '—'}</span>
+                    <div class="hidden justify-end" data-credit-edit-wrap="${tx.transaction_id}">
+                        <input type="number" step="0.01" min="0.01" value="${Number(tx.credit || 0).toFixed(2)}" data-credit-input="${tx.transaction_id}" class="w-24 border border-edge rounded-sm px-2 py-1 text-[11px] text-right font-mono font-bold text-gray-900 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
+                    </div>
+                </td>
+>>>>>>> Stashed changes
                 <td class="py-4 text-sm text-gray-900 text-right font-mono font-bold tracking-tight">₱${Number(tx.balance).toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
             </tr>      
         `).join('')
@@ -118,8 +139,123 @@ const renderTransactions = (transactions) => {
         `;
 }
 
+<<<<<<< Updated upstream
+=======
+transactionTbl.addEventListener('click', async (e) => {
+    const actionBtn = e.target.closest('button[data-action]');
+    if (!actionBtn) return;
+
+    const action = actionBtn.dataset.action;
+    const transactionId = actionBtn.dataset.transactionId;
+    if (!transactionId) return;
+
+    const actionGroup = transactionTbl.querySelector(`[data-edit-actions="${transactionId}"]`);
+    const formGroup = transactionTbl.querySelector(`[data-edit-form="${transactionId}"]`);
+    const creditDisplay = transactionTbl.querySelector(`[data-credit-display="${transactionId}"]`);
+    const creditEditWrap = transactionTbl.querySelector(`[data-credit-edit-wrap="${transactionId}"]`);
+    const input = transactionTbl.querySelector(`[data-credit-input="${transactionId}"]`);
+
+    if (!actionGroup || !formGroup || !creditDisplay || !creditEditWrap || !input) return;
+
+    if (action === 'edit') {
+        actionGroup.classList.add('hidden');
+        actionGroup.classList.remove('inline-flex');
+        creditDisplay.classList.add('hidden');
+        creditEditWrap.classList.remove('hidden');
+        creditEditWrap.classList.add('flex');
+        formGroup.classList.remove('hidden');
+        formGroup.classList.add('inline-flex');
+        input.focus();
+        input.select();
+        return;
+    }
+
+    if (action === 'cancel') {
+        const originalTx = currentProcedures
+            .flatMap(p => p.transactions)
+            .find(tx => String(tx.transaction_id) === String(transactionId));
+
+        if (originalTx) {
+            input.value = Number(originalTx.credit || 0).toFixed(2);
+        }
+
+        formGroup.classList.add('hidden');
+        formGroup.classList.remove('inline-flex');
+        creditEditWrap.classList.add('hidden');
+        creditEditWrap.classList.remove('flex');
+        creditDisplay.classList.remove('hidden');
+        actionGroup.classList.add('inline-flex');
+        actionGroup.classList.remove('hidden');
+        return;
+    }
+
+    if (action === 'save') {
+        const credit = parseFloat(input.value || 0.0);
+        console.log('Transaction ID: ' + transactionId)
+        console.log('CSRF: ' + document.querySelector('meta[name="csrf-token"]').content);
+        try {
+            const res = await fetch(`/transactions/${transactionId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({credit_amount: credit}),
+            });
+            
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data?.message || 'Server error');
+            }
+            
+            const updatedCredit = Number(data.credit_amount);
+            const updatedBalance = Number(data.running_balance);
+
+            creditDisplay.textContent = updatedCredit > 0.0 
+                ? `₱${credit.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+                : '—';
+
+            const row = actionBtn.closest('tr');
+            const balanceCell = row.querySelector('td:nth-child(5)');
+            if (balanceCell) {
+                balanceCell.textContent = `₱${updatedBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+            }
+            // exit edit mode
+            formGroup.classList.add('hidden');
+            formGroup.classList.remove('inline-flex');
+
+            creditEditWrap.classList.add('hidden');
+            creditEditWrap.classList.remove('flex');
+
+            creditDisplay.classList.remove('hidden');
+
+            actionGroup.classList.remove('hidden');
+            actionGroup.classList.add('inline-flex');
+
+            // refresh totals
+            const selectedId = ledgerSelector.value;
+            const procedure = currentProcedures.find(p => p.ledger_id == selectedId);
+            console.log('Procedure: ' + procedure);
+            if (procedure) {
+                const tx = procedure.transactions.find(t => t.transaction_id == transactionId);
+                if (tx) {
+                    tx.credit = updatedCredit;
+                    tx.balance = updatedBalance;
+                }
+                console.log('JSON TX: ' + JSON.stringify(tx));
+                updateTotals(procedure);
+            }
+        } catch (err) {
+            console.log(err.message);
+            alert(`ERROR: ${err.message}`);
+        }
+    }
+});
+
+>>>>>>> Stashed changes
 document.addEventListener('patientSelected', async (e) => {
     const patient = e.detail;
+    console.log('patient: ' + JSON.stringify(patient));
 
     const patientInfoContainer = document.getElementById('patient-info-container');
     if (!patientInfoContainer) return;

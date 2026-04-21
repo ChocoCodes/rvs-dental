@@ -324,6 +324,7 @@ class AppointmentController extends Controller
                         'transaction_id' => $tx->transaction_id,
                         'credit' => $tx->credit_amount,
                         'debit' => $tx->debit_amount,
+                        'type' => $tx->type,
                         'balance' => $tx->running_balance,
                         'mode_of_payment' => $tx->mode_of_payment,
                         'created_at' => $tx->created_at->format('M d, Y'),

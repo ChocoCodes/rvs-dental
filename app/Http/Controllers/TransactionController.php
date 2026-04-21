@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreTransactionRequest;
+use App\Models\Ledger;
 
 class TransactionController extends Controller
 {
@@ -66,6 +68,68 @@ class TransactionController extends Controller
         return view('pages.transactions', [
             'transactions' => Transaction::where('credit_amount', '>', 0)->latest()->paginate(10),
             'selectedTransaction' => $transaction
+        ]);
+    }
+
+    public function store(StoreTransactionRequest $request) {
+        $ledger = Ledger::with('transactions')->find($request->ledger_id);
+
+        $totalCharges = $ledger->transactions->sum('debit_amount');
+        $totalPayments = $ledger->transactions->sum('credit_amount');
+
+        $remaining = $totalCharges - $totalPayments;
+
+        $isPayment = $request->type === 'Payment';
+        $amount = (float) $request->credit_amount;
+
+        $newBalance = $isPayment ? $remaining - $amount : $remaining;
+
+        if ($isPayment && $amount > $remaining) {
+            return back()->withErrors([
+                'credit_amount' => 'Payment exceeds remaining balance.'
+            ])->withInput();
+        }
+
+        if ($isPayment && $remaining <= 0) {
+            return back()->withErrors([
+                'credit_amount' => 'This ledger is already paid in full.'
+            ])->withInput();
+        }
+
+        Transaction::create([
+            'ledger_id' => $ledger->ledger_id,
+            'type' => $request->type,
+            'debit_amount' => !$isPayment ? $amount : 0.00,
+            'credit_amount' => $isPayment ? $amount : 0.00,
+            'running_balance' => $newBalance,
+            'mode_of_payment' => $isPayment ? $request->mode_of_payment : null,
+        ]);
+
+        return back()->with('success', 'Transaction added successfully.');
+    }
+
+    public function update(Request $request, Transaction $transaction) {
+        $request->validate([
+            'credit_amount' => 'required|numeric|min:0.00'
+        ]);
+
+        $ledger = $transaction->ledger()->with('transactions')->first();
+        $totalPaid = $ledger->transactions
+            ->where('type', 'Payment')
+            ->where('transaction_id', '!=', $transaction->transaction_id)
+            ->sum('credit_amount');
+        $remainingBalance = $ledger->charged_price - $totalPaid;
+        $newBalance = $remainingBalance - (float) $request->credit_amount;
+
+        $transaction->update([
+            'credit_amount' => $request->credit_amount,
+            'running_balance' => $newBalance,
+        ]);
+
+        return response()->json([
+            'credit_amount' => $transaction->credit_amount,
+            'running_balance' => $transaction->running_balance,
+            'message' => 'Transaction updated successfully.'
         ]);
     }
 }

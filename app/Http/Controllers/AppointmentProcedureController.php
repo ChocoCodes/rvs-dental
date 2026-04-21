@@ -16,9 +16,17 @@ class AppointmentProcedureController extends Controller
                 ...$request->validated()
             ]);
     
-            $procedure->ledger()->create([
+            $ledger = $procedure->ledger()->create([
                 'description' => $request->ledger_description,
                 'charged_price' => $request->charged_price
+            ]);
+
+            $ledger->transactions()->create([
+                'type' => 'Charge',
+                'debit_amount' => $request->charged_price,
+                'credit_amount' => 0.0,
+                'running_balance' => $request->charged_price,
+                'mode_of_payment' => null
             ]);
         });
         return back()->with('success', 'Procedure added successfully.');

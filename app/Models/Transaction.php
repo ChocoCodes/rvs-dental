@@ -12,11 +12,11 @@ class Transaction extends Model
 
     protected $fillable = [
         'ledger_id',
-        'description',
         'mode_of_payment',
         'debit_amount',
         'credit_amount',
-        'running_balance'
+        'running_balance',
+        'type'
     ];
 
     public function ledger(): BelongsTo
