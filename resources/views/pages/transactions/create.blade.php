@@ -80,6 +80,7 @@
                                     <th class="py-3 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest text-right">Debit</th>
                                     <th class="py-3 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest text-right">Credit</th>
                                     <th class="py-3 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest text-right">Balance</th>
+                                    <th class="py-3 text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest text-right">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="transaction-info-table" class="divide-y divide-edge divide-dotted">
