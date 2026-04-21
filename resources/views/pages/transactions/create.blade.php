@@ -56,7 +56,81 @@
                 <tbody id="transaction-info-table"></tbody>
             </table>
         </div>
-        
+        <x-forms.container
+    action="{{ route('transactions.store') }}"
+    method="POST"
+>
+    {{-- Totals --}}
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+        <div class="p-4 rounded-xl bg-gray-100">
+            <p class="text-sm text-gray-500">TOTAL CHARGED</p>
+            <p id="total-charged" class="text-xl font-bold">₱0.00</p>
+        </div>
+        <div class="p-4 rounded-xl bg-gray-100">
+            <p class="text-sm text-gray-500">TOTAL PAID</p>
+            <p id="total-paid" class="text-xl font-bold text-green-600">₱0.00</p>
+        </div>
+        <div class="p-4 rounded-xl bg-gray-100">
+            <p class="text-sm text-gray-500">AFTER PAYMENT</p>
+            <p id="remaining-balance" class="text-xl font-bold text-red-500">₱0.00</p>
+        </div>
+    </div>
+
+    {{-- Record Payment --}}
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+        {{-- Credit Amount --}}
+        <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-600">CREDIT AMOUNT</label>
+            <input 
+                type="number" 
+                step="0.01"
+                name="credit_amount"
+                id="credit-amount"
+                class="border rounded-lg px-3 py-2 w-full"
+                placeholder="0.00"
+                required
+            >
+        </div>
+        {{-- Payment Mode --}}
+        <div class="flex flex-col gap-1">
+            <label class="text-sm text-gray-600">MODE</label>
+            <select 
+                name="mode_of_payment"
+                id="mode-of-payment"
+                class="border rounded-lg px-3 py-2 w-full"
+                required
+            >
+                @foreach ($paymentMode as $mode)
+                    <option value="{{ $mode }}">{{ $mode }}</option>
+                @endforeach
+            </select>
+        </div>
+        {{-- Pay in Full Button --}}
+        <div class="flex items-end">
+            <button 
+                type="button"
+                id="pay-full-btn"
+                class="w-full border rounded-lg px-3 py-2 hover:bg-gray-100"
+            >
+                Pay in full
+            </button>
+        </div>
+    </div>
+
+    {{-- Hidden Fields --}}
+    <input type="hidden" name="ledger_id" id="ledger-id">
+    
+    {{-- Submit --}}
+    <div class="flex justify-end mt-6">
+        <x-ui.button
+            type="submit"
+            variant="primary"
+            class="px-8 py-3 rounded-xl text-lg"
+        >
+            Record Transaction
+        </x-ui.button>
+    </div>
+</x-forms.container>
     </div>
 </div>
 @endsection
