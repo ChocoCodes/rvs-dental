@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    list.addEventListener('click', (e) => {
+    list.addEventListener('click', async (e) => {
         const row = e.target.closest('.patient-row');
         if (!row) return;
 
@@ -39,6 +39,10 @@ document.addEventListener('DOMContentLoaded', () => {
         } = JSON.parse(row.dataset.patient);
 
         console.log(row.dataset.patient);
+
+        const summaryResponse = await fetch(`/patients/${patientId}/summary`);
+        const summary = await summaryResponse.json();
+
         patientInfo.innerHTML = `
             <div class="flex-1 overflow-auto">
                 <p class="font-bold text-3xl p-4 border-b border-border">
@@ -72,22 +76,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="flex gap-8">
                         <div class="flex flex-col gap-4">
                             <div>
-                                <p class="text-2xl font-bold">{date}</p>
+                                <p class="text-2xl font-bold">${summary.last_appointment}</p>
                                 <p class="text-xs">Last Appointment</p>
                             </div>
                             <div>
-                                <p class="text-2xl font-bold">{date}</p>
+                                <p class="text-2xl font-bold">${summary.next_appointment}</p>
                                 <p class="text-xs">Next Appointment</p>
                             </div>
                         </div>
                         <div class="flex flex-col gap-4">
                             <div>
-                                <p class="text-2xl font-bold">{amount}</p>
+                                <p class="text-2xl font-bold">₱${Number(summary.deficiency).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                                 <p class="text-xs">Deficiency</p>
                             </div>
                             <div>
-                                <p class="text-2xl font-bold">{amount}</p>
-                                <p class="text-xs">Full Payment</p>
+                                <p class="text-2xl font-bold">₱${Number(summary.total_payment).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                                <p class="text-xs">Total Payments</p>
                             </div>
                         </div>
                     </div>

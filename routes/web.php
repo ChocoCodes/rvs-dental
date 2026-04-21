@@ -30,6 +30,7 @@ Route::middleware(['auth', 'role'])->group(function () {
     Route::prefix('/patients')->group(function () {
         Route::get('/search', [PatientController::class, 'search'])->name('patients.search');
         Route::get('/{patient}/appointments', [AppointmentController::class, 'forPatient'])->name('appointments.for-patient');
+        Route::get('/{patient}/summary', [PatientController::class, 'summary'])->name('patient.summary');
     });
 
     Route::get('/procedures', [ProcedureController::class, 'index']);

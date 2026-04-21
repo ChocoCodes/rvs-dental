@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Js;
 
 class PatientController extends Controller
 {
@@ -207,5 +208,41 @@ class PatientController extends Controller
             ->get(10);
 
         return response()->json($patients);
+    }
+
+    public function summary(Patient $patient): JsonResponse {
+        $patient->load([
+            'appointments.appointmentProcedures.ledger.transactions'
+        ]);
+
+        $lastAppointment = $patient->appointments
+            ->where('status', 'Completed')
+            ->sortByDesc('scheduled_at')
+            ->first();
+
+        $nextAppointment = $patient->appointments
+            ->where('status', 'Scheduled')
+            ->where('scheduled_at', '>=', now())
+            ->sortBy('scheduled_at')
+            ->first();
+
+        $allLedgers = $patient->appointments
+            ->flatMap(fn($a) => $a->appointmentProcedures)
+            ->map(fn($ap) => $ap->ledger)
+            ->filter();
+
+        $totalCharged = $allLedgers->sum('charged_price');
+
+        $totalPaid = $allLedgers
+            ->flatMap(fn($l) => $l->transactions)
+            ->where('type', 'Payment')
+            ->sum('credit_amount');
+
+        return response()->json([
+            'last_appointment' => $lastAppointment?->scheduled_at_fmt ?? 'N/A',
+            'next_appointment' => $nextAppointment?->scheduled_at_fmt ?? 'N/A',
+            'deficiency' => $totalCharged - $totalPaid,
+            'total_payment' => $totalPaid
+        ]);
     }
 }
