@@ -18,6 +18,7 @@ class UpdateAppointmentRequest extends FormRequest
             'patient_id' => 'sometimes|integer|exists:patients,patient_id',
             'dentist_id' => 'sometimes|integer|exists:dentists,dentist_id',
             'scheduled_at' => 'sometimes|date',
+            'slot' => 'sometimes|string|in:Morning,Afternoon',
             'status' => 'sometimes|string|in:Scheduled,Completed,Cancelled,No Show',
             'remarks' => 'sometimes|string|max:500'
         ];
@@ -30,6 +31,7 @@ class UpdateAppointmentRequest extends FormRequest
             'scheduled_at.required' => 'Please enter a schedule slot.',
             'scheduled_at.after'    => 'The schedule must be a future date and time.',
             'status.required'       => 'Please select a status.',
+            'slot.in'               => 'Invalid slot selection.',
             'status.in'             => 'The selected status is invalid.',
             'remarks.max'           => 'Remarks must not exceed 500 characters.',
         ];
