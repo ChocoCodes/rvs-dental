@@ -161,6 +161,7 @@
             value="{{ old('contact_no', $patient->contact_no) }}"
             pattern="^09[0-9]{9}$"
             required
+            placeholder="09123456789"
             variant="form"
         />
     </div>
