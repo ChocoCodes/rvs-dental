@@ -20,7 +20,11 @@
                     type="email"
                     placeholder="Enter your email"
                     class="w-full bg-secondary border border-primary py-2 px-4 placeholder:text-[#00000033]"
+                    value="{{ old('email') }}"
                 />
+                @error('email')
+                    <span class="text-red-500">{{ $message }}</span>
+                @enderror
             </div>
             <div class="flex flex-col gap-2 w-full">
                 <x-forms.label
@@ -31,9 +35,12 @@
                 <x-forms.input
                     name="password"
                     type="password"
-                    placeholder="Enter your password"
+                    placeholder="**********"
                     class="w-full bg-secondary border border-primary py-2 px-4 placeholder:text-[#00000033]"
                 />
+                @error('password')
+                    <span class="text-red-500">{{ $message }}</span>
+                @enderror
             </div>
             <x-ui.button type="submit" variant="primary" class="w-full">
                 LOG IN
