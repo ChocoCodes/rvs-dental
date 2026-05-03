@@ -16,7 +16,7 @@ class PatientSeeder extends Seeder
         DB::table('patients')->insert([
             [
                 'first_name'     => 'Mark',
-                'last_name'      => 'Lopez', // kagago hwqhahhahahahahah
+                'last_name'      => 'Lopez',
                 'image_filename' => null,
                 'date_of_birth'  => '1992-04-12',
                 'sex'            => 'Male',
@@ -31,7 +31,7 @@ class PatientSeeder extends Seeder
             [
                 'first_name'     => 'Angela',
                 'last_name'      => 'Garcia',
-                'image_filename' => 'profile-patient-2.jpg',
+                'image_filename' => null,
                 'date_of_birth'  => '1988-07-25',
                 'sex'            => 'Female',
                 'address'        => 'Bacolod City, Negros Occidental',
@@ -45,7 +45,7 @@ class PatientSeeder extends Seeder
             [
                 'first_name'     => 'Carlo',
                 'last_name'      => 'Fernandez',
-                'image_filename' => 'profile-patient-3.jpg',
+                'image_filename' => null,
                 'date_of_birth'  => '2014-02-18',
                 'sex'            => 'Male',
                 'address'        => 'Bacolod City, Negros Occidental',
@@ -59,7 +59,7 @@ class PatientSeeder extends Seeder
             [
                 'first_name'     => 'Liza',
                 'last_name'      => 'Torres',
-                'image_filename' => 'profile-patient-4.jpg',
+                'image_filename' => null,
                 'date_of_birth'  => '1995-11-03',
                 'sex'            => 'Female',
                 'address'        => 'Bacolod City, Negros Occidental',
@@ -73,7 +73,7 @@ class PatientSeeder extends Seeder
             [
                 'first_name'     => 'Ramon',
                 'last_name'      => 'Diaz',
-                'image_filename' => 'profile-patient-5.jpg',
+                'image_filename' => null,
                 'date_of_birth'  => '1980-09-14',
                 'sex'            => 'Male',
                 'address'        => 'Bacolod City, Negros Occidental',
@@ -101,7 +101,7 @@ class PatientSeeder extends Seeder
             [
                 'first_name'     => 'Paul',
                 'last_name'      => 'Rivera',
-                'image_filename' => 'profile-patient-7.jpg',
+                'image_filename' => null,
                 'date_of_birth'  => '1993-01-08',
                 'sex'            => 'Male',
                 'address'        => 'Bacolod City, Negros Occidental',
@@ -115,7 +115,7 @@ class PatientSeeder extends Seeder
             [
                 'first_name'     => 'Kim',
                 'last_name'      => 'Morales',
-                'image_filename' => 'profile-patient-8.jpg',
+                'image_filename' => null,
                 'date_of_birth'  => '1997-12-11',
                 'sex'            => 'Female',
                 'address'        => 'Bacolod City, Negros Occidental',
@@ -129,7 +129,7 @@ class PatientSeeder extends Seeder
             [
                 'first_name'     => 'Leo',
                 'last_name'      => 'Castro',
-                'image_filename' => 'profile-patient-9.jpg',
+                'image_filename' => null,
                 'date_of_birth'  => '1986-06-02',
                 'sex'            => 'Male',
                 'address'        => 'Bacolod City, Negros Occidental',
@@ -171,7 +171,7 @@ class PatientSeeder extends Seeder
             [
                 'first_name'     => 'Ella',
                 'last_name'      => 'Gutierrez',
-                'image_filename' => 'profile-patient-12.jpg',
+                'image_filename' => null,
                 'date_of_birth'  => '1989-08-08',
                 'sex'            => 'Female',
                 'address'        => 'Bacolod City, Negros Occidental',
@@ -185,7 +185,7 @@ class PatientSeeder extends Seeder
             [
                 'first_name'     => 'Noel',
                 'last_name'      => 'Sanchez',
-                'image_filename' => 'profile-patient-13.jpg',
+                'image_filename' => null,
                 'date_of_birth'  => '1975-02-14',
                 'sex'            => 'Male',
                 'address'        => 'Bacolod City, Negros Occidental',
@@ -213,7 +213,7 @@ class PatientSeeder extends Seeder
             [
                 'first_name'     => 'Arvin',
                 'last_name'      => 'Navarro',
-                'image_filename' => 'profile-patient-15.jpg',
+                'image_filename' => null,
                 'date_of_birth'  => '1990-05-05',
                 'sex'            => 'Male',
                 'address'        => 'Bacolod City, Negros Occidental',
@@ -227,7 +227,7 @@ class PatientSeeder extends Seeder
             [
                 'first_name'     => 'Diane',
                 'last_name'      => 'Mendoza',
-                'image_filename' => 'profile-patient-16.jpg',
+                'image_filename' => null,
                 'date_of_birth'  => '1996-09-09',
                 'sex'            => 'Female',
                 'address'        => 'Bacolod City, Negros Occidental',
@@ -241,7 +241,7 @@ class PatientSeeder extends Seeder
             [
                 'first_name'     => 'Kevin',
                 'last_name'      => 'Aquino',
-                'image_filename' => 'profile-patient-17.jpg',
+                'image_filename' => null,
                 'date_of_birth'  => '1987-03-03',
                 'sex'            => 'Male',
                 'address'        => 'Bacolod City, Negros Occidental',
@@ -255,7 +255,7 @@ class PatientSeeder extends Seeder
             [
                 'first_name'     => 'Faith',
                 'last_name'      => 'Salazar',
-                'image_filename' => 'profile-patient-18.jpg',
+                'image_filename' => null,
                 'date_of_birth'  => '1998-07-07',
                 'sex'            => 'Female',
                 'address'        => 'Bacolod City, Negros Occidental',
@@ -283,7 +283,7 @@ class PatientSeeder extends Seeder
             [
                 'first_name'     => 'Rose',
                 'last_name'      => 'Bautista',
-                'image_filename' => 'profile-patient-20.jpg',
+                'image_filename' => null,
                 'date_of_birth'  => '1993-12-12',
                 'sex'            => 'Female',
                 'address'        => 'Bacolod City, Negros Occidental',
